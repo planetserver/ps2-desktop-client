@@ -15,7 +15,6 @@ print tqs(f_encode( f_toEncode( RBRd, RBRn) , 'unsigned char', '"jpg"'))
 #BD530_2 = 1-(R530/Rc)#Needs function computeRc
 #Rc=(a*Rs+b*Rl) # c=530, s=716, l=440
 #b=(c-s)/(l-s)
-
 print tqs(f_encode( f_toEncodeBD3S(530,716,440) , 'unsigned char', '"jpg"'))
 
 #Product #4: SH600_2 = 600 shoulder height over 533 to 716 
@@ -23,7 +22,6 @@ print tqs(f_encode( f_toEncodeBD3S(530,716,440) , 'unsigned char', '"jpg"'))
 #Sensitive to high opacity in atmosphere
 
 print tqs(f_encode( f_toEncodeSH3S(600,533,716) , 'unsigned char', '"jpg"'))
-print tqs(f_encode( f_toEncodeBD3S(600,533,716) , 'unsigned char', '"jpg"'))
 
 print tqs(f_encode( f_toEncodeBD3Sinv(600,533,716) , 'unsigned char', '"jpg"'))
 
@@ -59,8 +57,6 @@ print tqs(f_encode( f_toEncodeBD3Sinv(920,807,984) , 'unsigned char', '"jpg"'))
 
 #Product #10: requires Product #9
 
-################ PAGE #2 #####
-
 #Product #11: requires integrating
 
 #Product #12: R1330
@@ -77,7 +73,7 @@ print tql(f_encode( f_toEncodeBD3L(1320,1080,1750) , 'unsigned char', '"jpg"'))
 
 
 print tqs(f_encode( f_BandDepthL(1320,1080,1750) , 'unsigned char', '"jpg"'))
-f_BandDepthL(c,s,l)
+#f_BandDepthL(c,s,l)
 
 #Product #14: OLLINDEX3: Detect broad absorption centred at 1 um
 #OLINDEX3 = RB1080*0.03+RB1152*0.03+RB1210*0.03+RB1250*0.03+RB1263*0.07+RB1276*0.07+RB1330*0.12+RB1368*0.12+RB1395*0.14+RB1427*0.18+RB1470*0.18
@@ -90,12 +86,12 @@ k_Rl = bandName(bandsL(2400))
 
 #f_R = lambda w: bandName(bandsL(w))
 #f_RCx = lambda c,s,l: f_plus( f_times(str(f_waveRatio(c,s,l)),f_minus(f_R(l),f_R(s))),f_R(s) )
-f_RCxOLINDEX3 = lambda c: RCx(c, 1750,2400)
-f_RBx = lambda c: f_over(f_minus(f_RCxOLINDEX3(c),f_R(c)), f_RCxOLINDEX3(c)  ) #NEED TO FIX THIS ONE !!!
+#f_RCxOLINDEX3 = lambda c: f_RCx(c, 1750,2400)
+f_RBxx = lambda c: f_over(f_minus(f_RCxOLINDEX3(c),f_R(c)), f_RCxOLINDEX3(c)  ) #NEED TO FIX THIS ONE !!!
 
-OLINDEX3raw = '('+f_RBx(1080)+' * 0.03 + '+f_RBx(1152)+' * 0.03 + '+f_RBx(1210)+' * 0.03 +'+f_RBx(1250)+'* 0.03 +'+f_RBx(1263)+' * 0.07 + '+f_RBx(1276)+' * 0.07 + '+f_RBx(1330)+' * 0.12 + '+f_RBx(1368)+' * 0.12 + '+f_RBx(1395)+' * 0.14 + '+f_RBx(1427)+' * 0.18 + '+f_RBx(1470)+' * 0.18)'
+OLINDEX3raw = '('+f_RBxx(1080)+' * 0.03 + '+f_RBxx(1152)+' * 0.03 + '+f_RBxx(1210)+' * 0.03 +'+f_RBxx(1250)+'* 0.03 +'+f_RBxx(1263)+' * 0.07 + '+f_RBxx(1276)+' * 0.07 + '+f_RBxx(1330)+' * 0.12 + '+f_RBxx(1368)+' * 0.12 + '+f_RBxx(1395)+' * 0.14 + '+f_RBxx(1427)+' * 0.18 + '+f_RBxx(1470)+' * 0.18)'
 
-f_indexNN = lambda waveList: '(' + ' * '.join( map(lambda c: f_isNotNull(f_R(c)), waveList )) + ')'
+#f_indexNN = lambda waveList: '(' + ' * '.join( map(lambda c: f_isNotNull(f_R(c)), waveList )) + ')'
 
 OLINDEX3nn = f_indexNN([1750,2400,1080,1152,1210,1250,1263,1276,1330,1368,1395,1427,1470])
 
@@ -110,14 +106,15 @@ print tql(f_encode( f_toEncode(OLINDEX3raw,OLINDEX3nn) , 'float', '"tif"'))
 
 print tql(f_encode( f_toEncodeIndex([(1690,0.20),(1750,0.20),(1810,0.30),(1870,0.30)],1560,2450) , 'int', '"jpg"'))
 args = [[(1690,0.20),(1750,0.20),(1810,0.30),(1870,0.30)],1560,2450]
-print tql(f_encode( f_times(f_indexRAW(*args),f_indexNN(*args)) , 'float', '"tif"'))
+print tql(f_encode( f_times(f_indexRAW(*args),f_indexNN([x[0] for x in args[0]] + [args[1],args[2]])) , 'float', '"tif"'))
 
 #Product #16: HCPINCEX2: Detect broad absorption centred at 2.12 um
 #Pyroxene is strongly +; favors HCP
 #Caveats: LCP
 args = [[(2120,0.10),(2140,0.10),(2230,0.15),(2250,0.30),(2430,0.20),(2460,0.15)],1690,2530]
 print tql(f_encode( f_toEncodeIndex(*args) , 'int', '"jpg"'))
-print tql(f_encode( f_times(f_indexRAW(*args),f_indexNN(*args)) , 'float', '"tif"'))
+#print tql(f_encode( f_times(f_indexRAW(*args),f_indexNN(*args)) , 'float', '"tif"'))
+print tql(f_encode( f_times(f_indexRAW(*args),f_indexNN([x[0] for x in args[0]] + [args[1],args[2]])) , 'float', '"tif"'))
 
 #Product #17: 1.0-2.3 um spectral variance
 #Requires computing a line of best fit - nearly impossible to do 
@@ -242,7 +239,7 @@ print tql(f_encode( f_toEncode(f_minus('1',f_over(f_sumRRCx([2290,2320,2330],181
 #Product #39: BD2355: 2355, 2300 2450
 #Chlorite, Prehnite, Pumpellyite
 #Caveats: Carbonate, Serpentine
-print tql(f_encode( f_toEncodeBD3L(2355, 2300 2450) , 'unsigned char', '"jpg"'))
+print tql(f_encode( f_toEncodeBD3L(2355, 2300, 2450) , 'unsigned char', '"jpg"'))
 
 #Product #40: SINDEX2: SH(2290,2120,2400)
 #Hydrated sulfates (mono and polyhydrated sulfates) will be strongly > 0
